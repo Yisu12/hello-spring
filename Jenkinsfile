@@ -1,18 +1,22 @@
 pipeline {
     agent any
-
+    options {
+        timestamps()
+    }
     stages {
+        stage('Test') {
+            steps {
+                 sh './mvnw test'
+                 junit 'target/surefire-reports/*.xml'
+            }
+        }
         stage('Build') {
             steps {
-                 sh './mvnw package'
+                 sh '''./mvnw package
+                 docker-compose build'''
             }
         }
-        stage('Docker Build') {
-            steps {
-                 sh 'docker-compose build'
-            }
-        }
-        stage('Docker Deploy') {
+        stage('Deploy') {
             steps {
                  sh 'docker-compose up -d'
             }
